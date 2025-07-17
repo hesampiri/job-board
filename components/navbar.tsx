@@ -8,10 +8,15 @@ import SignupDialog from "./signupDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { changeTheme } from "@/lib/features/theme/themeSlice";
 import { RootState } from "@/lib/store";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { useSession } from "next-auth/react";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const theme = useSelector((state: RootState) => state.theme.theme);
+  const theme = useSelector((state: RootState) => state.theme?.theme);
+  const session = useSession();
+  const user = session.data?.user;
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -52,12 +57,21 @@ const Navbar = () => {
             Contact
           </Link>
         </li>
-        <li>
-          <LoginDialog />
-        </li>
-        <li>
-          <SignupDialog />
-        </li>
+        {!user ? (
+          <li className=" flex gap-2">
+            <LoginDialog />
+            <SignupDialog />
+          </li>
+        ) : (
+          <li className=" flex gap-2">
+            <div>
+              <Avatar>
+                <AvatarImage src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_27.png" />
+                <AvatarFallback></AvatarFallback>
+              </Avatar>
+            </div>
+          </li>
+        )}
       </ul>
       <Sidbar />
     </div>
