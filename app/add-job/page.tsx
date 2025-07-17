@@ -1,9 +1,14 @@
-import React from 'react'
+"use client";
+import AddJobForm from "@/froms/addJobForm";
+import { SessionProvider } from "next-auth/react"
 
 const AddJobpage = () => {
   return (
-    <div>AddJob</div>
-  )
-}
+    <div className="container mx-auto p-4 ">
+      <h1>add job here</h1>
+        <AddJobForm />
+    </div>
+  );
+};
 
 export default AddJobpage;
