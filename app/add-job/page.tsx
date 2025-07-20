@@ -1,6 +1,6 @@
 "use client";
 import AddJobForm from "@/froms/addJobForm";
-import { SessionProvider } from "next-auth/react"
+
 
 const AddJobpage = () => {
   return (

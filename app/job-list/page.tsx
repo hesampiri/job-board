@@ -1,13 +1,13 @@
-"use client"
+import JobList from "@/components/jobList";
 
-import React from 'react'
+const JobListPage = () => {
 
-const JobList = () => {
   return (
-    <div>
-        <h1>Job List</h1>
+    <div className="container mx-auto">
+      <h1>Job List</h1>
+      <JobList />
     </div>
-  )
-}
+  );
+};
 
-export default JobList
+export default JobListPage;

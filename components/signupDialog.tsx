@@ -80,16 +80,6 @@ const SignupDialog = () => {
 
   async function onSubmit (values: z.infer<typeof formSchema>){
     setIsLoading(true);
-    // Register(values).then((res)=>{
-    //   setIsLoading(false);
-    //   setOpen(false);
-    //   form.reset()
-    //   res.type === 'success' ? toast.success(res.message) : toast.error(res.message)
-      
-    // })
-    // .catch(()=>{
-    //   throw new Error('something went wrong with registration')
-    // })
     try{
       const res = await Register(values) 
       if(res.type === 'success'){

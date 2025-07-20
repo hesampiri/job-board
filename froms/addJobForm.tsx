@@ -95,6 +95,7 @@ const AddJobForm = () => {
     if (job.type === "success") {
       form.reset()
       toast.success(job.message);
+      redirect('/dashboard')
     } else {
       toast.error(job.message);
     }
