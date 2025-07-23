@@ -15,7 +15,7 @@ export default function RootLayout({
           <body>
         <SessionProviderWraper>
             <Navbar />
-            <main className="flex-1 p-8">{children}</main>
+            <main className="flex-1 sm:p-8">{children}</main>
             <Toaster />
         </SessionProviderWraper>
           </body>
