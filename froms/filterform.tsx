@@ -1,5 +1,6 @@
 "use client";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MapPinPlusInside, Menu, Tags } from "lucide-react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -55,7 +56,10 @@ const Filterform = () => {
   return (
     <div className="flex flex-col text-sm sm:text-base">
       <div className="p-5 space-y-3">
-        <h3 className="font-semibold mb-4">Job Type</h3>
+                <div className="flex">
+          <Tags className="text-gray-500 mr-2" />
+          <h3 className="font-semibold mb-4">Jobtype</h3>
+        </div>
         {jobFilters.jobtypes.map((type, idx) => (
           <div key={idx} className="flex items-center gap-2 capitalize">
             <Checkbox
@@ -71,7 +75,10 @@ const Filterform = () => {
       </div>
       <hr className="my-4 border-t border-gray-300" />
       <div className="p-5 space-y-3">
-        <h3 className="font-semibold mb-4">Category</h3>
+        <div className="flex">
+          <Menu className="text-gray-500 mr-2" />
+          <h3 className="font-semibold mb-4">Category</h3>
+        </div>
         {jobFilters.jobCategory.map((cat, idx) => (
           <div key={idx} className="flex items-center gap-2 capitalize">
             <Checkbox
@@ -87,7 +94,10 @@ const Filterform = () => {
       </div>
       <hr className="my-4 border-t border-gray-300" />
       <div className=" p-5 space-y-3">
-        <h3 className="font-semibold mb-4">Location</h3>
+        <div className="flex">
+          <MapPinPlusInside className="text-gray-500 mr-2" />
+          <h3 className="font-semibold mb-4">Location</h3>
+        </div>
         {jobFilters.JobLocation.map((loc, idx) => (
           <div key={idx} className="flex items-center gap-2 capitalize">
             <Checkbox

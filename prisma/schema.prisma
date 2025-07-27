@@ -25,7 +25,7 @@ model Company {
   name        String
   description String?
   website     String?
-  logoUrl     String?
+  logoUrl     String? 
   jobs        Job[]
   users       User[]
 }

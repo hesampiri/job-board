@@ -10,7 +10,7 @@ import { changeTheme } from "@/lib/features/theme/themeSlice";
 import { RootState } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -30,6 +30,11 @@ const Navbar = () => {
         </h1>
       </Link>
       <ul className="sm:flex hidden flex-col sm:flex-row gap-2 sm:gap-4 text-sm sm:text-base items-center">
+        <li>
+          <Button variant={"destructive"} onClick={() => signOut()}>
+            Signout
+          </Button>
+        </li>
         <li>
           <Switch
             checked={theme === "dark"}
