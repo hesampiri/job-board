@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
+import { auth } from "./auth";
 
-export function middleware(request:any) {
-  // You can check cookies or headers here
-  // but avoid using next-auth or openid-client imports
+export default auth((req) => {
+  const pathname = req.nextUrl.pathname;
+  const session = req.auth;
+  console.log(pathname);
+  
 
-  const token = request.cookies.get("next-auth.session-token")?.value;
-  if (!token) {
-    // redirect to login
-    console.log("middel");
-    
+  if (!session && pathname.startsWith("/dashboard"))
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+
+  if (pathname.startsWith("/dashboard/employer") && session?.user.role !== "employer") {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  return NextResponse.next();
-}
+  if (pathname.startsWith("/dashboard/jobseeker") && session?.user.role !== "jobseeker") {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  }
+});
+
+export const config = {
+  matcher: ["/dashboard/:path"],
+};
