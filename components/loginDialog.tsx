@@ -61,7 +61,7 @@ const LoginDialog = () => {
       toast.error("invalid" + res.error);
     } else {
       setopen(false);
-      router.push("/dashboard");
+      router.push("/");
       form.reset();
     }
   }

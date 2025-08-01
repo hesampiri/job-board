@@ -20,12 +20,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { Job, JobTag, Tag } from "@prisma/client";
+import { UpdateJob } from "@/app/actions/updateJob";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -34,7 +36,7 @@ const formSchema = z.object({
   description: z.string().min(1, {
     message: "Description is required",
   }),
-  location: z.enum(["remote", "hybrid", "onsite"], {
+  location: z.string({
     message: "Location is required",
   }),
   type: z.enum(["full_time", "part_time", "contract"], {
@@ -55,20 +57,58 @@ const formSchema = z.object({
   }),
 });
 
-const AddJobForm = () => {
+type TagType = {
+  id: string;
+  jobId: string;
+  tagId: string;
+  tag: Tag;
+};
+
+type fromProp = {
+  currentJob?: {
+    id: string;
+    title: string;
+    description: string;
+    location: string;
+    type: "full_time" | "part_time" | "contract";
+    category:
+      | "software_development"
+      | "design"
+      | "marketing"
+      | "sales"
+      | "hr"
+      | "finance"
+      | "other";
+    salary: number;
+    tags: TagType[];
+  };
+  type: string;
+};
+
+const AddJobForm = ({ currentJob, type }: fromProp) => {
+  const defaultValue = {
+    title: "",
+    description: "",
+    location: "onsite",
+    type: "full_time",
+    category: "software_development",
+    tags: [],
+  };
+
   const { data: session, status } = useSession();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      location: "onsite",
-      type: "full_time",
-      category: "software_development",
-      // salary:0,
-      tags: [],
+      title: currentJob?.title ?? "",
+      description: currentJob?.description ?? "",
+      salary: currentJob?.salary! ?? "",
+      location: currentJob?.location ?? "remote",
+      type: currentJob?.type ?? "full_time",
+      category: currentJob?.category ?? "software_development",
+      tags: currentJob?.tags.map((t) => t.tag.name) ?? [],
     },
   });
+  const watchedValues = useWatch({ control: form.control });
 
   const tags = [
     "frontend",
@@ -89,17 +129,29 @@ const AddJobForm = () => {
   }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const companyId = session?.user.companyId;
-    const finalValues = { ...values, companyId };
-    const job = await AddJob(values);
-    if (job.type === "success") {
-      form.reset()
-      toast.success(job.message);
-      redirect('/dashboard')
+    console.log("clickde in form");
+
+    if (type === "add") {
+      const companyId = session?.user.companyId;
+      const job = await AddJob(values);
+      if (job.type === "success") {
+        form.reset();
+        toast.success(job.message);
+        redirect("/dashboard/employer");
+      } else {
+        toast.error(job.message);
+      }
     } else {
-      toast.error(job.message);
+      const updated = await UpdateJob(values, currentJob?.id as string);
+      if (updated.message === "success") {
+        toast.success(updated.message);
+      } else {
+        toast.error(updated.message);
+      }
     }
   };
+
+  // console.log("Watched:", watchedValues);
 
   return (
     <div>
@@ -122,10 +174,10 @@ const AddJobForm = () => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="text-sm">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <Textarea {...field} rows={10} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -235,8 +287,8 @@ const AddJobForm = () => {
                 <FormLabel>Salary</FormLabel>
                 <FormControl>
                   <Input
-                    {...field}
                     type="number"
+                    value={field.value.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                 </FormControl>
@@ -245,7 +297,7 @@ const AddJobForm = () => {
             )}
           />
           <Button type="submit" className="mt-10">
-            Add Job
+            {type === "add" ? "Add job" : "Edit"}
           </Button>
         </form>
       </Form>
