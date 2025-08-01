@@ -6,7 +6,7 @@ import FilterBar from "./filterBar";
 import { Prisma } from "@prisma/client";
 
 type Props = {
-  searchParams: {
+  searchValues: {
     type?: string | string[];
     location?: string;
     category?: string;
@@ -14,8 +14,8 @@ type Props = {
   };
 };
 
-const JobList = async ({ searchParams }: Props) => {
-  const { type, location, category, sortBy } = searchParams;
+const JobList = async ({ searchValues }: Props) => {
+  const { type, location, category, sortBy } = searchValues;
 
   const toArray = (value: string | string[] | undefined) => {
     if (!value) return [];
@@ -71,13 +71,13 @@ const JobList = async ({ searchParams }: Props) => {
             />
           ))
         ) : (
-          <div className=" text-center flex items-center flex-col gap-3 text-gray-500">
+          <div className=" text-center flex items-center pt-44 flex-col gap-3 text-gray-500">
             <CircleAlert />
             <p>No Match Found</p>
           </div>
         )}
       </div>
-      <div className="col-span-1 border hidden sm:block">
+      <div className="col-span-1 border rounded-sm hidden sm:block">
         <Filterform />
       </div>
     </div>
