@@ -9,16 +9,17 @@ const JobListPage = ({
     type?: string;
     location?: string;
     category?: string;
+    sortBy?: string;
   };
 }) => {
   return (
     <div className="container mx-auto">
       <div className="flex sm:py-5 p-2  items-center">
-        <SortBySelect/>
-        {/* <p className="text-sm text-gray-500">suggestions</p> */}
+        <p className="text-xs text-gray-500 mr-2">Sort By</p>
+        <SortBySelect />
         <FilterBar />
       </div>
-      <JobList searchParams={searchParams || {}} />
+      <JobList searchValues={searchParams || {}} />
     </div>
   );
 };

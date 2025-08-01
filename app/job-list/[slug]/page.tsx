@@ -2,9 +2,11 @@ import { prisma } from "@/prisma";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { BookmarkButton } from "@/components/bookmarkButton";
+import AddApplicationButton from "@/components/addApplicationButton";
 
 const ViewJobpage = async ({ params }: any) => {
   const session = await auth();
+  const userRole = session?.user.role;
   const userId = session?.user.id;
   const { slug } = await params;
   const job = await prisma.job.findUnique({
@@ -65,6 +67,13 @@ const ViewJobpage = async ({ params }: any) => {
             <p>${job?.salary.toLocaleString()}</p>
           </div>
           <p className="text-gray-500">posted {getPostTime(job!.createdAt)}</p>
+        </div>
+        <div className="p-5">
+          <AddApplicationButton
+            jobId={job?.id as string}
+            userId={userId}
+            userRole={userRole}
+          />
         </div>
       </div>
     </div>

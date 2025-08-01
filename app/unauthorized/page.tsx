@@ -1,9 +1,14 @@
+import { CircleAlert } from "lucide-react";
+import Link from "next/link";
+
 const Unauthorizedpage = () => {
   return (
-    <div>
-        <p>You are not authorized to view this page!</p>
+    <div className="container mx-auto text-center text-gray-500 font-semibold flex items-center flex-col gap-2 pt-44 text-sm sm:text-base ">
+      <CircleAlert size={45} />
+      <h1 className="text-2xl font-bold">Access Denied</h1>
+      <p>You do not have permission to view this page.</p>
     </div>
-  )
-}
+  );
+};
 
-export default Unauthorizedpage
+export default Unauthorizedpage;

@@ -25,7 +25,7 @@ export const AddJob = async (values: jobProp) => {
   const { title, description, location, type, category, tags, salary } = values;
 
   try {
-    const job = await prisma.job.create({
+    await prisma.job.create({
       data: {
         title,
         description,
@@ -47,7 +47,8 @@ export const AddJob = async (values: jobProp) => {
       },
     });
     return { message: "Job posted successfully", type: "success" };
-  } catch {
+  } catch (error) {
+    console.log(`error : ${error}`);
     return { message: "somthing went wrong", type: "error" };
   }
 };
