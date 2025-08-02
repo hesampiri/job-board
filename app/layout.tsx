@@ -3,6 +3,7 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { Toaster } from "sonner";
 import SessionProviderWraper from "./sessionProviderWraper";
+import Head from "next/head";
 
 export default function RootLayout({
   children,
@@ -12,6 +13,9 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <html lang="en">
+        <Head>
+          <title>Jobly</title>
+        </Head>
           <body>
         <SessionProviderWraper>
             <Navbar />

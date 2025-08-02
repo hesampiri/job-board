@@ -33,7 +33,7 @@ const ViewJobpage = async ({ params }: any) => {
 
   return (
     <div className="mx-auto container">
-      <div className="shadow-md shadow-gray-500 max-w-[900px] mx-auto">
+      <div className="shadow-md shadow-gray-500 max-w-[900px] mx-auto sm:mt-0 mt-10">
         <div className="border p-5 mx-auto flex items-center">
           <div className="relative sm:w-[90px] sm:h-[90px] w-14 h-14">
             <Image

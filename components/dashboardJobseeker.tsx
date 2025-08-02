@@ -48,7 +48,7 @@ const DashboardJobseeker = ({ userInfo }: DashProp) => {
             <div className="relative sm:w-[150px] sm:h-[150px] w-24 h-24 self-center mt-5 border-yellow-400 border-4 rounded-full">
               <Image
                 alt="companyLogo"
-                src={"/images/default-cmpny.jpg"}
+                src={"/images/default-avatar-icon.jpg"}
                 fill
                 className="object-cover rounded-full"
               />
@@ -114,26 +114,35 @@ const DashboardJobseeker = ({ userInfo }: DashProp) => {
           </nav>
           <div className="max-h-[700px] overflow-auto">
             {view === "applications" ? (
-              userInfo?.applications.map((app) => (
-                <div
-                  className="w-full border rounded-sm p-5 flex items-center sm:flex-row flex-col sm:space-y-0 space-y-5 mt-1 shadow-md"
-                  key={app.id}
-                >
-                  <div>
-                    <h1 className="font-semibold">{app.job.title}</h1>
-                    <p className="text-xs">
-                      created at {app.job.createdAt.toLocaleString()}
-                    </p>
+              userInfo?.applications.length !== 0 ? (
+                userInfo?.applications.map((app) => (
+                  <div
+                    className="w-full border rounded-sm p-5 flex items-center sm:flex-row flex-col sm:space-y-0 space-y-5 mt-1 shadow-md"
+                    key={app.id}
+                  >
+                    <div>
+                      <h1 className="font-semibold">{app.job.title}</h1>
+                      <p className="text-xs">
+                        created at {app.job.createdAt.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="ml-auto flex gap-2 w-full sm:w-auto">
+                      <Button asChild className="flex-1" title="view the job ">
+                        <Link href={`/job-list/${app.job.id}`}>
+                          <Eye />
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
-                  <div className="ml-auto flex gap-2 w-full sm:w-auto">
-                    <Button asChild className="flex-1" title="view the job ">
-                      <Link href={`/job-list/${app.job.id}`}>
-                        <Eye />
-                      </Link>
-                    </Button>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center  mt-20 capitalize font-semibold text-gray-500 flex flex-col items-center gap-4">
+                  <h1>no applications sent</h1>
+                  <Button variant={"outline"} asChild className="text-yellow-400 border-yellow-400">
+                    <Link href={"/job-list"}>brows job</Link>
+                  </Button>
                 </div>
-              ))
+              )
             ) : userInfo?.bookmarks.length === 0 ? (
               <div className="text-center  mt-20 capitalize font-semibold text-gray-500 flex flex-col items-center">
                 <Frown />

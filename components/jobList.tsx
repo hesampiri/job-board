@@ -116,7 +116,7 @@ const JobList = async ({ searchValues }: Props) => {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <PaginationItem key={p}>
                 <PaginationLink
-                  href={`?page=${p}`}
+                  href={p === 1 ? "/job-list" : `?page=${p}`}
                   isActive={Number(page) === p}
                 >
                   {p}

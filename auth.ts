@@ -7,12 +7,14 @@ import { DefaultJWT } from "next-auth/jwt";
 declare module "next-auth" {
   interface User {
     id: string;
+    name:string
     role: "employer" | "jobseeker";
     companyId: string | null;
   }
   interface Session {
     user: {
       id: string;
+      name:string;
       role: "employer" | "jobseeker";
       companyId: string | null;
     };
@@ -21,12 +23,14 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
+    name:string;
     role: "employer" | "jobseeker";
     companyId: string | null;
   }
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {
@@ -50,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (passwordsmatch)
           return {
             id: user.id,
+            name: user.name,
             email: user.email,
             role: user.role,
             companyId: user.companyId,
@@ -64,6 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ user, token }) {
       if (user) {
+        token.name = user.name;
         token.id = user.id;
         token.role = user.role;
         token.companyId = user.companyId;
@@ -72,6 +78,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ token, session }) {
       session.user.id = token.id as string;
+      session.user.name = token.name as string;
       session.user.role = token.role as "employer" | "jobseeker";
       session.user.companyId = token.companyId as string;
       return session;

@@ -76,7 +76,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-2 py-1 px-3 cursor-pointer">
                   <span className="border py-1 px-2  w-[100px] rounded flex items-center justify-between gap-1">
                     <ChevronDown size={15} />
-                    <p className="text-sm">user</p>
+                    <p className="text-sm">{user.name}</p>
                   </span>
                 </div>
               </DropdownMenuTrigger>
