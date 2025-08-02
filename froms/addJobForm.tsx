@@ -23,11 +23,12 @@ import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Job, JobTag, Tag } from "@prisma/client";
 import { UpdateJob } from "@/app/actions/updateJob";
+import { useFormStatus } from "react-dom";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -95,7 +96,9 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
     tags: [],
   };
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -121,30 +124,22 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
     "cybersecurity",
   ];
 
-  if (status === "loading") return null;
-
-  const user = session?.user;
-  if (user && user.role !== "employer") {
-    redirect("/unauthorized");
-  }
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("clickde in form");
-
     if (type === "add") {
       const companyId = session?.user.companyId;
       const job = await AddJob(values);
       if (job.type === "success") {
         form.reset();
         toast.success(job.message);
-        redirect("/dashboard/employer");
+        router.push("/dashboard/employer");
       } else {
         toast.error(job.message);
       }
     } else {
       const updated = await UpdateJob(values, currentJob?.id as string);
-      if (updated.message === "success") {
+      if (updated.type === "success") {
         toast.success(updated.message);
+        router.push("/dashboard/employer");
       } else {
         toast.error(updated.message);
       }

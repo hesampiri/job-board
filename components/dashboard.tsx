@@ -82,7 +82,7 @@ const Dashboard = ({ userInfo }: DashProp) => {
                 className="object-cover rounded-full"
               />
             </div>
-            <div className="mt-5 px-2 space-y-2">
+            <div className="mt-5 px-5 space-y-2">
               <div>
                 <h1 className="text-xs text-gray-500 capitalize">
                   company name
@@ -178,6 +178,7 @@ const Dashboard = ({ userInfo }: DashProp) => {
                       className="flex-1"
                       title="edite the job"
                       variant={"outline"}
+                      asChild
                     >
                       <Link href={`employer/update-job/${job.id}`}>
                         <Pencil />

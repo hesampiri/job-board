@@ -19,8 +19,6 @@ type jobProp = {
 };
 export const UpdateJob = async (values: jobProp, id: string) => {
   const { title, description, location, type, category, tags, salary  } = values;
-  console.log(values);
-  console.log(id);
 
   try {
     await prisma.job.update({

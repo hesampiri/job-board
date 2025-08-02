@@ -53,7 +53,7 @@ const DashboardJobseeker = ({ userInfo }: DashProp) => {
                 className="object-cover rounded-full"
               />
             </div>
-            <div className="mt-5 px-2 space-y-2">
+            <div className="mt-5 px-5 space-y-2">
               <div>
                 <h1 className="text-xs text-gray-500 capitalize">user name</h1>
                 <p>{userInfo?.name}</p>
@@ -67,26 +67,20 @@ const DashboardJobseeker = ({ userInfo }: DashProp) => {
         </div>
       </div>
       <div className="sm:col-span-3 h-screen">
-        {/* <div className="flex flex-col sm:flex-row gap-2 px-2">
+        <div className="flex flex-col sm:flex-row gap-2 px-2">
           <div className="p-5 border flex-1 rounded text-center flex items-center justify-center flex-col max-h-[100px] font-semibold bg-yellow-100 ">
             <h1 className="text-3xl font-extrabold text-yellow-500">
-              {applicationNumber}
+              {userInfo?.applications.length}
             </h1>
-            <p className="text-black">Applications recieved</p>
+            <p className="text-black">Applications sent</p>
           </div>
           <div className="p-5 border flex-1 rounded text-center flex items-center justify-center flex-col max-h-[100px] font-semibold bg-yellow-100">
             <h1 className="text-3xl font-extrabold text-yellow-500">
-              {userInfo?.company?.jobs.length}
+              {userInfo?.bookmarks.length}
             </h1>
-            <p className="text-black">Job Posted</p>
+            <p className="text-black">Job saved</p>
           </div>
-          <div className="p-5 border flex-1 rounded text-center flex items-center justify-center flex-col max-h-[100px] font-semibold bg-yellow-100">
-            <h1 className="text-3xl font-extrabold text-yellow-500">
-              {applicationperJob}
-            </h1>
-            <p className="text-black">Applications per Job </p>
-          </div>
-        </div> */}
+        </div>
         <div className="px-2 mt-5">
           <nav className="mt-10 mb-4  w-full text-sm border-b-2">
             <ul className="flex">
@@ -138,7 +132,11 @@ const DashboardJobseeker = ({ userInfo }: DashProp) => {
               ) : (
                 <div className="text-center  mt-20 capitalize font-semibold text-gray-500 flex flex-col items-center gap-4">
                   <h1>no applications sent</h1>
-                  <Button variant={"outline"} asChild className="text-yellow-400 border-yellow-400">
+                  <Button
+                    variant={"outline"}
+                    asChild
+                    className="text-yellow-400 border-yellow-400"
+                  >
                     <Link href={"/job-list"}>brows job</Link>
                   </Button>
                 </div>
