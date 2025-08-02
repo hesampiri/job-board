@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { Building2, Clock, Receipt } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
 type JobInfo = {
@@ -16,7 +16,7 @@ type JobInfo = {
 
 const JobCard = (data: JobInfo) => {
   return (
-    <div className="sm:p-5 p-2 border rounded-sm w-full flex flex-col sm:flex-row space-y-5 sm:space-y-0 items-center">
+    <div className="sm:p-5 p-2 border rounded-sm w-full flex flex-col sm:flex-row space-y-5 sm:space-y-0 items-center mt-1">
       <Suspense  fallback={<Skeleton className="h-[80px] w-[80px]"/>}>
         <div className="relative sm:w-[80px] sm:h-[80px] w-24 h-24 ">
           <Image

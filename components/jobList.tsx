@@ -4,6 +4,15 @@ import Filterform from "@/froms/filterform";
 import { CircleAlert } from "lucide-react";
 import FilterBar from "./filterBar";
 import { Prisma } from "@prisma/client";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "./ui/pagination";
 
 type Props = {
   searchValues: {
@@ -11,11 +20,12 @@ type Props = {
     location?: string;
     category?: string;
     sortBy?: string;
+    page?: string;
   };
 };
 
 const JobList = async ({ searchValues }: Props) => {
-  const { type, location, category, sortBy } = searchValues;
+  const { type, location, category, sortBy, page = 1 } = searchValues;
 
   const toArray = (value: string | string[] | undefined) => {
     if (!value) return [];
@@ -34,7 +44,12 @@ const JobList = async ({ searchValues }: Props) => {
     sortBy as keyof typeof sortOptions
   ] ?? { createdAt: "desc" };
 
+  const pageSize = 10;
+  const skip = ((Number(page) || 1) - 1) * pageSize;
+
   const jobs = await prisma.job.findMany({
+    skip,
+    take: pageSize,
     where: {
       ...(typeArray.length > 0 && {
         type:
@@ -55,30 +70,67 @@ const JobList = async ({ searchValues }: Props) => {
     orderBy,
   });
 
+  const alljobs = await prisma.job.count();
+  const currentpage = Number(page);
+  console.log(currentpage);
+
+  const totalPages = Math.ceil(alljobs / pageSize);
+  const prevPage = currentpage > 1 ? currentpage - 1 : currentpage;
+  const nextPage = currentpage < totalPages ? currentpage + 1 : currentpage;
+
   return (
-    <div className="grid sm:grid-cols-4 gap-2">
-      <div className="col-span-3">
-        {jobs.length > 0 ? (
-          jobs.map((job) => (
-            <JobCard
-              key={job.id}
-              id={job.id}
-              title={job.title}
-              salary={job.salary}
-              jobType={job.type}
-              logo={job.company.logoUrl}
-              companyName={job.company.name}
-            />
-          ))
-        ) : (
-          <div className=" text-center flex items-center pt-44 flex-col gap-3 text-gray-500">
-            <CircleAlert />
-            <p>No Match Found</p>
-          </div>
-        )}
+    <div>
+      <div className="grid sm:grid-cols-4 gap-2">
+        <div className="col-span-3">
+          {jobs.length > 0 ? (
+            jobs.map((job) => (
+              <JobCard
+                key={job.id}
+                id={job.id}
+                title={job.title}
+                salary={job.salary}
+                jobType={job.type}
+                logo={job.company.logoUrl}
+                companyName={job.company.name}
+              />
+            ))
+          ) : (
+            <div className=" text-center flex items-center pt-44 flex-col gap-3 text-gray-500">
+              <CircleAlert />
+              <p>No Match Found</p>
+            </div>
+          )}
+        </div>
+        <div className="col-span-1 border rounded-sm hidden sm:block">
+          <Filterform />
+        </div>
       </div>
-      <div className="col-span-1 border rounded-sm hidden sm:block">
-        <Filterform />
+      <div className="py-5 border-yellow-400">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href={prevPage === 1 ? "/job-list" : `?page=${prevPage}`}
+              />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink
+                  href={`?page=${p}`}
+                  isActive={Number(page) === p}
+                >
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href={`?page=${nextPage}`} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

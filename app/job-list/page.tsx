@@ -20,6 +20,7 @@ const JobListPage = ({
         <FilterBar />
       </div>
       <JobList searchValues={searchParams || {}} />
+      
     </div>
   );
 };
