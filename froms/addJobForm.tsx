@@ -20,15 +20,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Job, JobTag, Tag } from "@prisma/client";
+import { Tag } from "@prisma/client";
 import { UpdateJob } from "@/app/actions/updateJob";
-import { useFormStatus } from "react-dom";
 
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -87,16 +85,6 @@ type fromProp = {
 };
 
 const AddJobForm = ({ currentJob, type }: fromProp) => {
-  const defaultValue = {
-    title: "",
-    description: "",
-    location: "onsite",
-    type: "full_time",
-    category: "software_development",
-    tags: [],
-  };
-
-  const { data: session } = useSession();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -104,14 +92,14 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
     defaultValues: {
       title: currentJob?.title ?? "",
       description: currentJob?.description ?? "",
-      salary: currentJob?.salary! ?? "",
+      salary: currentJob?.salary ?? 0,
       location: currentJob?.location ?? "remote",
       type: currentJob?.type ?? "full_time",
       category: currentJob?.category ?? "software_development",
       tags: currentJob?.tags.map((t) => t.tag.name) ?? [],
     },
   });
-  const watchedValues = useWatch({ control: form.control });
+  // const watchedValues = useWatch({ control: form.control });
 
   const tags = [
     "frontend",
@@ -126,7 +114,6 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (type === "add") {
-      const companyId = session?.user.companyId;
       const job = await AddJob(values);
       if (job.type === "success") {
         form.reset();

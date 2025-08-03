@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { prisma } from "@/prisma";
 import bcrypt from "bcrypt";
 
@@ -33,7 +33,7 @@ export const Register = async (values: registerProps) => {
 
   const hashedpass = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name,
       role,
@@ -52,5 +52,5 @@ export const Register = async (values: registerProps) => {
     },
   });
 
-  return { message: "user successfully registered", type: "success" , email };
+  return { message: "user successfully registered", type: "success", email };
 };

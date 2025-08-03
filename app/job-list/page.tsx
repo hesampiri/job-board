@@ -12,8 +12,19 @@ import {
 } from "@/components/ui/pagination";
 import Filterform from "@/froms/filterform";
 import { prisma } from "@/prisma";
-import { Prisma } from "@prisma/client";
+import { CategoryType, JobType, Prisma } from "@prisma/client";
 import { CircleAlert } from "lucide-react";
+
+type jobType = {
+  id: string;
+  salary: number;
+  title: string;
+  type: JobType;
+  company?: {
+    logoUrl: string | null;
+    name: string;
+  };
+};
 
 type searchparamsType = {
   type?: string | string[];
@@ -26,7 +37,7 @@ type searchparamsType = {
 export default async function JobListPage({
   searchParams,
 }: {
-  searchParams?: any;
+  searchParams?: searchparamsType;
 }) {
   const { type, location, category, sortBy, page = 1 } = searchParams || {};
 
@@ -56,15 +67,15 @@ export default async function JobListPage({
     where: {
       ...(typeArray.length > 0 && {
         type:
-          typeArray?.length === 1 ? (typeArray[0] as any) : { in: typeArray },
+          typeArray?.length === 1 ? (typeArray[0] as JobType) : { in: typeArray as JobType[] },
       }),
       ...(locArray.length > 0 && {
         location:
-          locArray?.length === 1 ? (locArray[0] as any) : { in: locArray },
+          locArray?.length === 1 ? (locArray[0] as string ) : { in: locArray },
       }),
       ...(catArray.length > 0 && {
         category:
-          catArray?.length === 1 ? (catArray[0] as any) : { in: catArray },
+          catArray?.length === 1 ? (catArray[0] as CategoryType) : { in: catArray as CategoryType[] },
       }),
     },
     include: {
@@ -87,20 +98,19 @@ export default async function JobListPage({
         <SortBySelect />
         <FilterBar />
       </div>
-      {/* <JobList searchValues={searchParams || {}} /> */}
       <div>
         <div className="grid sm:grid-cols-4 gap-2">
           <div className="col-span-3">
             {jobs.length > 0 ? (
-              jobs.map((job: any) => (
+              jobs.map((job: jobType) => (
                 <JobCard
                   key={job.id}
                   id={job.id}
                   title={job.title}
                   salary={job.salary}
                   jobType={job.type}
-                  logo={job.company.logoUrl}
-                  companyName={job.company.name}
+                  logo={job.company?.logoUrl}
+                  companyName={job.company?.name}
                 />
               ))
             ) : (

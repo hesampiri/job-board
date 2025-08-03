@@ -11,7 +11,7 @@ type JobInfo = {
   salary: number;
   jobType: string;
   logo?: string | null;
-  companyName: String;
+  companyName: string | undefined;
 };
 
 const JobCard = (data: JobInfo) => {

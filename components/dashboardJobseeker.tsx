@@ -1,33 +1,10 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { User, Company, Job, Application, Bookmark } from "@prisma/client";
-import {
-  Bookmark as BookmarkIcon,
-  Briefcase,
-  Eye,
-  FileUser,
-  Frown,
-  Pencil,
-  Trash,
-} from "lucide-react";
-import JobCard from "./jobCard";
+import React, { useState } from "react";
+import { Job, Application, Bookmark } from "@prisma/client";
+import { Bookmark as BookmarkIcon, Eye, FileUser, Frown } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import DeleteJob from "@/app/actions/deleteJob";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 export type DashProp = {
   userInfo: {

@@ -1,5 +1,5 @@
 import { CircleAlert } from "lucide-react";
-import Link from "next/link";
+
 
 const Unauthorizedpage = () => {
   return (

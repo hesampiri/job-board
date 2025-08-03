@@ -1,7 +1,7 @@
 "use client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MapPinPlusInside, Menu, Tags } from "lucide-react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 type FilterParams = {
@@ -11,7 +11,6 @@ type FilterParams = {
 };
 
 const Filterform = () => {
-  const searchParams = useSearchParams();
   const { replace } = useRouter();
   const pathname = usePathname();
   const [filters, setFilters] = useState<FilterParams>({

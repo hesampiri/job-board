@@ -2,32 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
-import { DefaultJWT } from "next-auth/jwt";
-
-declare module "next-auth" {
-  interface User {
-    id: string;
-    name:string
-    role: "employer" | "jobseeker";
-    companyId: string | null;
-  }
-  interface Session {
-    user: {
-      id: string;
-      name:string;
-      role: "employer" | "jobseeker";
-      companyId: string | null;
-    };
-  }
-}
-declare module "next-auth/jwt" {
-  interface JWT extends DefaultJWT {
-    id: string;
-    name:string;
-    role: "employer" | "jobseeker";
-    companyId: string | null;
-  }
-}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,

@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { prisma } from "@/prisma";
 
 type jobProp = {
@@ -18,7 +18,7 @@ type jobProp = {
   salary: number;
 };
 export const UpdateJob = async (values: jobProp, id: string) => {
-  const { title, description, location, type, category, tags, salary  } = values;
+  const { title, description, location, type, category, tags, salary } = values;
 
   try {
     await prisma.job.update({

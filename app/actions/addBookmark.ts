@@ -2,7 +2,7 @@
 
 import { prisma } from "@/prisma";
 
-export const AddBookmark = async (prevState: any, formData: FormData) => {
+export const AddBookmark = async (formData: FormData) => {
   const userId = formData.get("userId") as string;
   const jobId = formData.get("jobId") as string;
 
@@ -35,7 +35,8 @@ export const AddBookmark = async (prevState: any, formData: FormData) => {
       },
     });
     return { type: "success", message: "Bookmarked successfully" };
-  } catch (err) {
+  } catch (error) {
+    console.log(error);
     return { type: "error", message: "Bookmark failed" };
   }
 };
