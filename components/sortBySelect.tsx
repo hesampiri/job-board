@@ -5,11 +5,10 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const SortBySelect = () => {
   const params = new URLSearchParams();
@@ -17,7 +16,6 @@ const SortBySelect = () => {
   const pathname = usePathname();
   const HandleChange = (value: string) => {
     if (value) params.append("sortBy", value);
-    else null;
     replace(`${pathname}?${params}`);
   };
   return (
