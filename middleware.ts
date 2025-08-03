@@ -1,22 +1,34 @@
 import { NextResponse } from "next/server";
 import { auth } from "./auth";
 
-export default auth((req) => {
+export default auth(async (req) => {
   const pathname = req.nextUrl.pathname;
   const session = req.auth;
-  console.log(pathname);
-  
 
-  if (!session && pathname.startsWith("/dashboard"))
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[middleware] pathname:", pathname);
+    console.log("[middleware] session:", session);
+  }
 
-  if (pathname.startsWith("/dashboard/employer") && session?.user.role !== "employer") {
+  if (!session && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  if (pathname.startsWith("/dashboard/jobseeker") && session?.user.role !== "jobseeker") {
+  if (
+    pathname.startsWith("/dashboard/employer") &&
+    session?.user.role !== "employer"
+  ) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
+
+  if (
+    pathname.startsWith("/dashboard/jobseeker") &&
+    session?.user.role !== "jobseeker"
+  ) {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  }
+
+  return NextResponse.next();
 });
 
 export const config = {
