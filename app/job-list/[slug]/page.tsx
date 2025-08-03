@@ -4,11 +4,11 @@ import { auth } from "@/auth";
 import { BookmarkButton } from "@/components/bookmarkButton";
 import AddApplicationButton from "@/components/addApplicationButton";
 
-const ViewJobpage = async ({ params }: { params: { slug: string } }) => {
+const ViewJobpage = async ({ params }: { params: Promise<{ slug: string }>; }) => {
   const session = await auth();
   const userRole = session?.user.role;
   const userId = session?.user.id;
-  const { slug } = params;
+  const { slug } = await params;
   const job = await prisma.job.findUnique({
     where: {
       id: slug,
