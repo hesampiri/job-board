@@ -34,7 +34,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Register } from "@/app/actions/register";
 import { toast } from "sonner";
 import { signIn } from "next-auth/react";
-import { register } from "module";
 
 const formSchema = z
   .object({

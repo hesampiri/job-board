@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import DashboardJobseeker from "@/components/dashboardJobseeker";
 import { prisma } from "@/prisma";
-import { redirect } from "next/navigation";
 import React from "react";
 
 const JobseekerDashboardPage = async () => {

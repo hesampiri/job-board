@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "./ui/button";
 import addApplication from "@/app/actions/addApplication";
 import { toast } from "sonner";
