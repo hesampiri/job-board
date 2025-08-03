@@ -26,20 +26,16 @@ type jobType = {
   };
 };
 
-type searchparamsType = {
+type searchparamsType = Promise<{
   type?: string | string[];
   location?: string;
   category?: string;
   sortBy?: string;
   page?: string;
-};
+}>;
 
-export default async function JobListPage({
-  searchParams,
-}: {
-  searchParams?: searchparamsType;
-}) {
-  const { type, location, category, sortBy, page = 1 } = searchParams || {};
+export default async function JobListPage(props:{searchParams:searchparamsType}){
+  const  { type, location, category, sortBy, page = 1 } =  await props.searchParams || {};
 
   const toArray = (value: string | string[] | undefined) => {
     if (!value) return [];
@@ -67,15 +63,19 @@ export default async function JobListPage({
     where: {
       ...(typeArray.length > 0 && {
         type:
-          typeArray?.length === 1 ? (typeArray[0] as JobType) : { in: typeArray as JobType[] },
+          typeArray?.length === 1
+            ? (typeArray[0] as JobType)
+            : { in: typeArray as JobType[] },
       }),
       ...(locArray.length > 0 && {
         location:
-          locArray?.length === 1 ? (locArray[0] as string ) : { in: locArray },
+          locArray?.length === 1 ? (locArray[0] as string) : { in: locArray },
       }),
       ...(catArray.length > 0 && {
         category:
-          catArray?.length === 1 ? (catArray[0] as CategoryType) : { in: catArray as CategoryType[] },
+          catArray?.length === 1
+            ? (catArray[0] as CategoryType)
+            : { in: catArray as CategoryType[] },
       }),
     },
     include: {
