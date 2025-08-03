@@ -1,15 +1,12 @@
 import AddJobForm from "@/froms/addJobForm";
 import { prisma } from "@/prisma";
-import React from "react";
 
-interface Props {
-  params: {
-    slug: string;
-  };
+interface PageProps {
+  params: Promise<{ slug: string }>;
 }
 
-const UpdateJobpage = async ({ params }: Props) => {
-  const { slug } = params;
+const UpdateJobpage = async ({ params }: PageProps) => {
+  const { slug } = await params;
   const job = await prisma.job.findUnique({
     where: {
       id: slug,
