@@ -1,7 +1,8 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { auth } from "./auth";
+import authConfig from "./auth.config";
 
-export default auth(async (req) => {
+export default NextAuth(authConfig).auth(async (req) => {
   const pathname = req.nextUrl.pathname;
   const session = req.auth;
 
