@@ -1,16 +1,11 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect } from "react";
-import Sidbar from "./sidbar";
-import { Switch } from "@/components/ui/switch";
+import React from "react";
+import Sidebar from "./sidebar";
 import LoginDialog from "./loginDialog";
 import SignupDialog from "./signupDialog";
-import { useDispatch, useSelector } from "react-redux";
-import { changeTheme, setTheme } from "@/lib/features/theme/themeSlice";
-import { RootState } from "@/lib/store";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { signOut, useSession } from "next-auth/react";
-import { Label } from "./ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,107 +17,91 @@ import {
 import { ChevronDown } from "lucide-react";
 
 const Navbar = () => {
-  const dispatch = useDispatch();
-  const theme = useSelector((state: RootState) => state.theme?.theme);
   const session = useSession();
   const user = session.data?.user;
 
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored) {
-      dispatch(setTheme(stored));
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
   return (
-    <div className="flex sm:flex-row justify-between items-center bg-black text-white py-4 px-6 container mx-auto sticky top-0 z-10">
-      <Link href="/">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">Jobly</h1>
-      </Link>
-      <ul className="sm:flex hidden flex-col sm:flex-row gap-2 sm:gap-4 text-sm sm:text-base items-center">
-        <li>
-          <Link href="/" className="hover:text-gray-300 transition-colors">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/job-list"
-            className="hover:text-gray-300 transition-colors"
-          >
-            Jobs
-          </Link>
-        </li>
-        <li className="flex items-center gap-2">
-          <Switch
-            checked={theme === "dark"}
-            onCheckedChange={() => dispatch(changeTheme())}
-          />
-          <Label className="text-xs">Theme</Label>
-        </li>
-        {!user ? (
-          <li className=" flex gap-2">
-            <LoginDialog />
-            <SignupDialog />
+    <header className="sticky top-0 z-40 border-b border-hairline bg-background/80 backdrop-blur-md">
+      <div className="container mx-auto flex h-14 items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="grid h-5 w-5 place-items-center rounded-[4px] bg-primary text-[11px] font-semibold text-primary-foreground">
+            J
+          </span>
+          <span className="text-[15px] font-semibold tracking-tight">
+            Jobly
+          </span>
+        </Link>
+
+        <ul className="hidden items-center gap-6 text-sm text-ink-subtle sm:flex">
+          <li>
+            <Link href="/" className="transition-colors hover:text-ink">
+              Home
+            </Link>
           </li>
-        ) : (
-          <li className=" flex gap-2">
+          <li>
+            <Link
+              href="/job-list"
+              className="transition-colors hover:text-ink"
+            >
+              Jobs
+            </Link>
+          </li>
+        </ul>
+
+        <div className="flex items-center gap-2">
+          {!user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <LoginDialog />
+              <SignupDialog />
+            </div>
+          ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 py-1 px-3 cursor-pointer">
-                  <span className="border py-1 px-2  w-[100px] rounded flex items-center justify-between gap-1">
-                    <ChevronDown size={15} />
-                    <p className="text-sm">{user.name}</p>
-                  </span>
-                </div>
+                <button className="flex items-center gap-2 rounded-md border border-hairline bg-surface-1 py-1.5 pl-2 pr-3 text-sm text-ink transition-colors hover:border-hairline-strong">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_27.png" />
+                    <AvatarFallback className="text-[10px]">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="max-w-[120px] truncate">{user.name}</span>
+                  <ChevronDown size={14} className="text-ink-subtle" />
+                </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel className="select-none">
-                  My Account
+              <DropdownMenuContent
+                align="end"
+                className="w-48 border-hairline bg-surface-2"
+              >
+                <DropdownMenuLabel className="select-none text-xs text-ink-subtle">
+                  {user.email}
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-hairline" />
                 {user.role === "employer" ? (
                   <DropdownMenuItem asChild>
-                    <Link
-                      href={"/dashboard/employer/add-job"}
-                      className="cursor-pointer"
-                    >
-                      Add job
+                    <Link href="/dashboard/employer/add-job" className="cursor-pointer">
+                      Post a job
                     </Link>
                   </DropdownMenuItem>
                 ) : null}
                 <DropdownMenuItem asChild>
-                  <Link
-                    href={`/dashboard/${user.role}`}
-                    className="cursor-pointer"
-                  >
+                  <Link href={`/dashboard/${user.role}`} className="cursor-pointer">
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-hairline" />
                 <DropdownMenuItem
                   onClick={() => signOut({ redirect: true, redirectTo: "/" })}
-                  className="text-red-500 cursor-pointer"
+                  className="cursor-pointer text-destructive"
                 >
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <div>
-              <Avatar>
-                <AvatarImage src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_27.png" />
-                <AvatarFallback></AvatarFallback>
-              </Avatar>
-            </div>
-          </li>
-        )}
-      </ul>
-      <Sidbar />
-    </div>
+          )}
+          <Sidebar />
+        </div>
+      </div>
+    </header>
   );
 };
 

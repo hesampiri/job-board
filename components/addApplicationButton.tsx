@@ -1,18 +1,22 @@
 "use client";
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import addApplication from "@/app/actions/addApplication";
 import { toast } from "sonner";
 
 type Props = {
-  userId: string | undefined;
   jobId: string;
   userRole: string | undefined;
 };
 
-const AddApplicationButton = ({ jobId, userId, userRole }: Props) => {
-  const clickHandle = async (jobId: string, userId: string | undefined) => {
-    const application = await addApplication(jobId, userId);
+const AddApplicationButton = ({ jobId, userRole }: Props) => {
+  const [loading, setLoading] = useState(false);
+
+  const clickHandle = async (jobId: string) => {
+    setLoading(true);
+    const application = await addApplication(jobId);
+    setLoading(false);
     if (application.type === "error") {
       toast.error(application.message);
     } else {
@@ -22,13 +26,15 @@ const AddApplicationButton = ({ jobId, userId, userRole }: Props) => {
 
   return (
     <Button
-      onClick={() => clickHandle(jobId, userId)}
+      onClick={() => clickHandle(jobId)}
       className="w-full"
-      disabled={userRole === "employer"}
+      disabled={userRole === "employer" || loading}
     >
-      {userRole === "jobseeker" || !userId
-        ? "Send your application"
-        : "Only jobseekers can send application"}
+      {loading
+        ? "Sending..."
+        : userRole === "jobseeker" || !userRole
+          ? "Send your application"
+          : "Only jobseekers can send application"}
     </Button>
   );
 };

@@ -41,7 +41,7 @@ const formSchema = z
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(8, { message: "Password must be at least 8 characters." }),
     role: z.enum(["employer", "jobseeker"]),
-    companyName: z.string({message:"company name must be atleast 3 character"}),
+    companyName: z.string({message:"company name must be at least 3 characters"}),
     description: z.string(),
     website: z.string().url().optional(),
     logoUrl: z.string().url().optional(),
@@ -99,7 +99,7 @@ const SignupDialog = () => {
       }
     }
     catch{
-      toast.error("somthing went wrong with registeration")
+      toast.error("Something went wrong with registration")
     }
     finally{
       setIsLoading(false)
@@ -108,10 +108,10 @@ const SignupDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default">SignUp</Button>
+        <Button>Get started</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-      {isLoading && <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+      {isLoading && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <Loader2 className="w-10 h-10 animate-spin" />
       </div>}
         <DialogHeader>
@@ -145,7 +145,7 @@ const SignupDialog = () => {
               )}
             /> 
              {form.watch("role") === "employer" && (
-              <section>
+              <section className="space-y-4">
                 <FormField
                   control={form.control}
                   name="companyName"
@@ -244,6 +244,9 @@ const SignupDialog = () => {
                         variant="ghost"
                         className="absolute right-0 top-0"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? <Eye /> : <EyeOff />}
                       </Button>

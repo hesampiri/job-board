@@ -1,28 +1,42 @@
 "use server";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma";
+import { z } from "zod";
 
-type jobProp = {
-  title: string;
-  description: string;
-  location: string;
-  type: "full_time" | "part_time" | "contract";
-  category:
-    | "software_development"
-    | "design"
-    | "marketing"
-    | "sales"
-    | "hr"
-    | "finance"
-    | "other";
-  tags?: string[];
-  salary: number;
-};
+const AddJobSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1),
+  location: z.string().min(1),
+  type: z.enum(["full_time", "part_time", "contract"]),
+  category: z.enum([
+    "software_development",
+    "design",
+    "marketing",
+    "sales",
+    "hr",
+    "finance",
+    "other",
+  ]),
+  tags: z.array(z.string()).optional(),
+  salary: z.number().int().min(0),
+});
 
-export const AddJob = async (values: jobProp) => {
+export const AddJob = async (values: z.infer<typeof AddJobSchema>) => {
   const session = await auth();
-  const userCompanyId = session?.user.companyId;
-  const { title, description, location, type, category, tags, salary } = values;
+  if (!session?.user) {
+    return { message: "You must be signed in", type: "error" };
+  }
+  if (session.user.role !== "employer") {
+    return { message: "Only employers can post jobs", type: "error" };
+  }
+
+  const parsed = AddJobSchema.safeParse(values);
+  if (!parsed.success) {
+    return { message: "Invalid input", type: "error" };
+  }
+
+  const { title, description, location, type, category, tags, salary } =
+    parsed.data;
 
   try {
     await prisma.job.create({
@@ -33,7 +47,7 @@ export const AddJob = async (values: jobProp) => {
         type,
         category,
         salary,
-        companyId: userCompanyId as string,
+        companyId: session.user.companyId!,
         tags: {
           create: tags?.map((tag) => ({
             tag: {
@@ -48,7 +62,7 @@ export const AddJob = async (values: jobProp) => {
     });
     return { message: "Job posted successfully", type: "success" };
   } catch (error) {
-    console.log(`error : ${error}`);
-    return { message: "somthing went wrong", type: "error" };
+    console.error("AddJob error:", error);
+    return { message: "Something went wrong", type: "error" };
   }
 };

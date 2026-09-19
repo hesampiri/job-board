@@ -99,7 +99,6 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
       tags: currentJob?.tags.map((t) => t.tag.name) ?? [],
     },
   });
-  // const watchedValues = useWatch({ control: form.control });
 
   const tags = [
     "frontend",
@@ -132,8 +131,6 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
       }
     }
   };
-
-  // console.log("Watched:", watchedValues);
 
   return (
     <div>
@@ -278,8 +275,12 @@ const AddJobForm = ({ currentJob, type }: fromProp) => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="mt-10">
-            {type === "add" ? "Add job" : "Edit"}
+          <Button type="submit" className="mt-10" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting
+              ? "Saving..."
+              : type === "add"
+                ? "Add job"
+                : "Edit"}
           </Button>
         </form>
       </Form>

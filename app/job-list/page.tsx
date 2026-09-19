@@ -1,6 +1,7 @@
 import FilterBar from "@/components/filterBar";
 import JobCard from "@/components/jobCard";
 import SortBySelect from "@/components/sortBySelect";
+import SearchInput from "@/components/searchInput";
 import {
   Pagination,
   PaginationContent,
@@ -10,7 +11,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import Filterform from "@/froms/filterform";
+import Filterform from "@/forms/filterForm";
 import { prisma } from "@/prisma";
 import { CategoryType, JobType, Prisma } from "@prisma/client";
 import { CircleAlert } from "lucide-react";
@@ -32,10 +33,11 @@ type searchparamsType = Promise<{
   category?: string;
   sortBy?: string;
   page?: string;
+  q?: string;
 }>;
 
 export default async function JobListPage(props:{searchParams:searchparamsType}){
-  const  { type, location, category, sortBy, page = 1 } =  await props.searchParams || {};
+  const  { type, location, category, sortBy, page = "1", q } =  await props.searchParams || {};
 
   const toArray = (value: string | string[] | undefined) => {
     if (!value) return [];
@@ -57,50 +59,90 @@ export default async function JobListPage(props:{searchParams:searchparamsType})
   const pageSize = 10;
   const skip = ((Number(page) || 1) - 1) * pageSize;
 
+  const where: Prisma.JobWhereInput = {
+    ...(q && {
+      OR: [
+        { title: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+      ],
+    }),
+    ...(typeArray.length > 0 && {
+      type:
+        typeArray?.length === 1
+          ? (typeArray[0] as JobType)
+          : { in: typeArray as JobType[] },
+    }),
+    ...(locArray.length > 0 && {
+      location:
+        locArray?.length === 1 ? (locArray[0] as string) : { in: locArray },
+    }),
+    ...(catArray.length > 0 && {
+      category:
+        catArray?.length === 1
+          ? (catArray[0] as CategoryType)
+          : { in: catArray as CategoryType[] },
+    }),
+  };
+
   const jobs = await prisma.job.findMany({
     skip,
     take: pageSize,
-    where: {
-      ...(typeArray.length > 0 && {
-        type:
-          typeArray?.length === 1
-            ? (typeArray[0] as JobType)
-            : { in: typeArray as JobType[] },
-      }),
-      ...(locArray.length > 0 && {
-        location:
-          locArray?.length === 1 ? (locArray[0] as string) : { in: locArray },
-      }),
-      ...(catArray.length > 0 && {
-        category:
-          catArray?.length === 1
-            ? (catArray[0] as CategoryType)
-            : { in: catArray as CategoryType[] },
-      }),
-    },
+    where,
     include: {
       company: true,
     },
     orderBy,
   });
 
-  const alljobs = await prisma.job.count();
+  const alljobs = await prisma.job.count({ where });
   const currentpage = Number(page);
-  console.log(currentpage);
 
   const totalPages = Math.ceil(alljobs / pageSize);
   const prevPage = currentpage > 1 ? currentpage - 1 : currentpage;
   const nextPage = currentpage < totalPages ? currentpage + 1 : currentpage;
+
+  const buildHref = (p: number) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (type) {
+      const arr = toArray(type);
+      arr.forEach((v) => params.append("type", v));
+    }
+    if (location) {
+      const arr = toArray(location);
+      arr.forEach((v) => params.append("location", v));
+    }
+    if (category) {
+      const arr = toArray(category);
+      arr.forEach((v) => params.append("category", v));
+    }
+    if (sortBy) params.set("sortBy", sortBy);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return qs ? `/job-list?${qs}` : "/job-list";
+  };
+
   return (
-    <div className="container mx-auto min-h-screen overflow-y-auto">
-      <div className="flex sm:py-5 p-2  items-center">
-        <p className="text-xs text-gray-500 mr-2">Sort By</p>
-        <SortBySelect />
-        <FilterBar />
+    <div className="container mx-auto min-h-screen px-2">
+      <div className="mb-6 flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-[-0.02em]">
+            Open roles
+          </h1>
+          <p className="mt-1 text-sm text-ink-subtle">
+            {alljobs} {alljobs === 1 ? "job" : "jobs"} found
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-hairline bg-surface-1 p-3">
+          <SearchInput />
+          <p className="ml-auto text-xs text-ink-subtle">Sort by</p>
+          <SortBySelect />
+          <FilterBar />
+        </div>
       </div>
       <div>
-        <div className="grid sm:grid-cols-4 gap-2">
-          <div className="col-span-3">
+        <div className="grid gap-6 sm:grid-cols-4">
+          <div className="sm:col-span-3">
             {jobs.length > 0 ? (
               jobs.map((job: jobType) => (
                 <JobCard
@@ -114,28 +156,26 @@ export default async function JobListPage(props:{searchParams:searchparamsType})
                 />
               ))
             ) : (
-              <div className=" text-center flex items-center pt-44 flex-col gap-3 text-gray-500">
+              <div className="flex flex-col items-center gap-3 pt-32 text-center text-ink-subtle">
                 <CircleAlert />
-                <p>No Match Found</p>
+                <p>No jobs match your search</p>
               </div>
             )}
           </div>
-          <div className="col-span-1 border rounded-sm hidden sm:block">
+          <div className="col-span-1 hidden rounded-xl border border-hairline bg-surface-1 sm:block">
             <Filterform />
           </div>
         </div>
-        <div className="py-5 border-yellow-400">
+        <div className="py-8">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious
-                  href={prevPage === 1 ? "/job-list" : `?page=${prevPage}`}
-                />
+                <PaginationPrevious href={buildHref(prevPage)} />
               </PaginationItem>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <PaginationItem key={p}>
                   <PaginationLink
-                    href={p === 1 ? "/job-list" : `?page=${p}`}
+                    href={buildHref(p)}
                     isActive={Number(page) === p}
                   >
                     {p}
@@ -146,7 +186,7 @@ export default async function JobListPage(props:{searchParams:searchparamsType})
                 <PaginationEllipsis />
               </PaginationItem>
               <PaginationItem>
-                <PaginationNext href={`?page=${nextPage}`} />
+                <PaginationNext href={buildHref(nextPage)} />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

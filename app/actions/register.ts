@@ -1,19 +1,31 @@
 "use server";
 import { prisma } from "@/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
 
-type registerProps = {
-  name: string;
-  email: string;
-  password: string;
-  role: "jobseeker" | "employer";
-  companyName: string;
-  description?: string;
-  logoUrl?: string;
-  website?: string;
-};
+const RegisterSchema = z
+  .object({
+    name: z.string().min(1).max(100),
+    email: z.string().email(),
+    password: z.string().min(8).max(128),
+    role: z.enum(["jobseeker", "employer"]),
+    companyName: z.string().optional(),
+    description: z.string().optional(),
+    logoUrl: z.string().url().optional(),
+    website: z.string().url().optional(),
+  })
+  .refine((data) => data.role !== "employer" || data.companyName, {
+    message: "Company name is required for employers",
+    path: ["companyName"],
+  });
 
-export const Register = async (values: registerProps) => {
+export const Register = async (values: z.infer<typeof RegisterSchema>) => {
+  const parsed = RegisterSchema.safeParse(values);
+  if (!parsed.success) {
+    const msg = parsed.error.errors[0]?.message ?? "Invalid input";
+    return { message: msg, type: "error" };
+  }
+
   const {
     email,
     password,
@@ -23,22 +35,21 @@ export const Register = async (values: registerProps) => {
     website,
     logoUrl,
     name,
-  } = values;
+  } = parsed.data;
 
-  const userExistance = await prisma.user.findUnique({ where: { email } });
-
-  if (userExistance) {
-    return { message: "user already exists", type: "error" };
+  const userExists = await prisma.user.findUnique({ where: { email } });
+  if (userExists) {
+    return { message: "User already exists", type: "error" };
   }
 
-  const hashedpass = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
     data: {
       name,
       role,
       email,
-      password: hashedpass,
+      password: hashedPassword,
       ...(role === "employer" && {
         company: {
           create: {
@@ -52,5 +63,5 @@ export const Register = async (values: registerProps) => {
     },
   });
 
-  return { message: "user successfully registered", type: "success", email };
+  return { message: "Registration successful", type: "success", email };
 };

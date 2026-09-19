@@ -1,7 +1,7 @@
 "use client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MapPinPlusInside, Menu, Tags } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 type FilterParams = {
@@ -13,11 +13,12 @@ type FilterParams = {
 const Filterform = () => {
   const { replace } = useRouter();
   const pathname = usePathname();
-  const [filters, setFilters] = useState<FilterParams>({
-    type: [],
-    location: [],
-    category: [],
-  });
+  const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<FilterParams>(() => ({
+    type: searchParams.getAll("type"),
+    location: searchParams.getAll("location"),
+    category: searchParams.getAll("category"),
+  }));
 
   const jobFilters = {
     jobtypes: ["full_time", "part_time", "contract"],
@@ -34,7 +35,11 @@ const Filterform = () => {
   };
 
   useEffect(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(window.location.search);
+    params.delete("type");
+    params.delete("location");
+    params.delete("category");
+    params.delete("page");
     Object.entries(filters).forEach(([key, values]) => {
       values.forEach((v) => params.append(key, v));
     });
@@ -53,10 +58,10 @@ const Filterform = () => {
   };
 
   return (
-    <div className="flex flex-col text-sm sm:text-base">
+    <div className="flex flex-col text-sm">
       <div className="p-5 space-y-3">
                 <div className="flex">
-          <Tags className="text-gray-500 mr-2" />
+          <Tags className="text-ink-subtle mr-2" />
           <h3 className="font-semibold mb-4">Jobtype</h3>
         </div>
         {jobFilters.jobtypes.map((type, idx) => (
@@ -72,10 +77,10 @@ const Filterform = () => {
           </div>
         ))}
       </div>
-      <hr className="my-4 border-t border-gray-300" />
+      <hr className="my-4 border-t border-hairline" />
       <div className="p-5 space-y-3">
         <div className="flex">
-          <Menu className="text-gray-500 mr-2" />
+          <Menu className="text-ink-subtle mr-2" />
           <h3 className="font-semibold mb-4">Category</h3>
         </div>
         {jobFilters.jobCategory.map((cat, idx) => (
@@ -91,10 +96,10 @@ const Filterform = () => {
           </div>
         ))}
       </div>
-      <hr className="my-4 border-t border-gray-300" />
+      <hr className="my-4 border-t border-hairline" />
       <div className=" p-5 space-y-3">
         <div className="flex">
-          <MapPinPlusInside className="text-gray-500 mr-2" />
+          <MapPinPlusInside className="text-ink-subtle mr-2" />
           <h3 className="font-semibold mb-4">Location</h3>
         </div>
         {jobFilters.JobLocation.map((loc, idx) => (

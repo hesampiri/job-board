@@ -16,37 +16,37 @@ type JobInfo = {
 
 const JobCard = (data: JobInfo) => {
   return (
-    <div className="sm:p-5 p-2 border rounded-sm w-full flex flex-col sm:flex-row space-y-5 sm:space-y-0 items-center mt-1">
-      <Suspense  fallback={<Skeleton className="h-[80px] w-[80px]"/>}>
-        <div className="relative sm:w-[80px] sm:h-[80px] w-24 h-24 ">
+    <div className="mt-2 flex w-full flex-col items-center gap-4 rounded-xl border border-hairline bg-surface-1 p-4 transition-colors hover:border-hairline-strong sm:flex-row">
+      <Suspense fallback={<Skeleton className="h-[56px] w-[56px]" />}>
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-hairline bg-surface-2">
           <Image
-            alt="companyLogo"
+            alt={`${data.companyName} logo`}
             src={data.logo || "/images/default-cmpny.jpg"}
             fill
-            className="object-cover rounded "
+            className="object-cover"
           />
         </div>
       </Suspense>
-      <div className="ml-5 w-full sm:w-auto">
-        <h1 className="font-semibold text-xs sm:text-base">{data.title}</h1>
-        <span className="flex items-center text-gray-500">
+      <div className="w-full min-w-0 sm:w-auto">
+        <h2 className="truncate text-[15px] font-medium text-ink">
+          {data.title}
+        </h2>
+        <span className="mt-0.5 flex items-center text-ink-subtle">
           <Building2 size={12} />
-          <p className="text-xs sm:text-sm capitalize ml-2">
-            {data.companyName}
-          </p>
+          <p className="ml-1.5 text-xs capitalize">{data.companyName}</p>
         </span>
-        <div className="flex mt-1 gap-2">
-          <span className="bg-yellow-100 rounded block text-yellow-500 text-center sm:text-sm text-xs font-semibold py-0.5 px-3">
-            <p>${data.salary.toLocaleString()}</p>
+        <div className="mt-2 flex gap-2">
+          <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-medium text-ink-muted">
+            ${data.salary.toLocaleString()}
           </span>
-          <span className="bg-blue-100 rounded block text-blue-500 text-center sm:text-sm text-xs font-semibold py-0.5 px-3 capitalize">
-            <p>{data.jobType.replace("_", " ")}</p>
+          <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-medium capitalize text-ink-muted">
+            {data.jobType.replace("_", " ")}
           </span>
         </div>
       </div>
-      <div className="ml-auto w-full sm:w-auto">
-        <Link href={`job-list/${data.id}`}>
-          <Button size={"lg"} className="text-xs sm:text-sm w-full">
+      <div className="ml-auto w-full shrink-0 sm:w-auto">
+        <Link href={`/job-list/${data.id}`}>
+          <Button size="sm" variant="secondary" className="w-full sm:w-auto">
             View
           </Button>
         </Link>

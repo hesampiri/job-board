@@ -1,9 +1,17 @@
-"use server"
+"use server";
+import { auth } from "@/auth";
 import { prisma } from "@/prisma";
 
-const addApplication = async (jobId: string, userId: string | undefined) => {
-  if (!userId || !jobId) {
+const addApplication = async (jobId: string) => {
+  const session = await auth();
+  if (!session?.user) {
     return { message: "You need to sign in first", type: "error" };
+  }
+
+  const userId = session.user.id;
+
+  if (!jobId) {
+    return { message: "Missing job ID", type: "error" };
   }
 
   try {
@@ -24,7 +32,7 @@ const addApplication = async (jobId: string, userId: string | undefined) => {
 
     return { message: "Application sent", type: "success" };
   } catch (error) {
-    console.error("Application error:", error);
+    console.error("addApplication error:", error);
     return { message: "Something went wrong", type: "error" };
   }
 };

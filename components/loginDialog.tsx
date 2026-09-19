@@ -58,7 +58,7 @@ const LoginDialog = () => {
     setIsLoading(false)
     
     if (res?.error) {
-      toast.error("invalid" + res.error);
+      toast.error("Invalid email or password");
     } else {
       setopen(false);
       router.push("/");
@@ -68,11 +68,11 @@ const LoginDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setopen}>
       <DialogTrigger asChild>
-        <Button variant="default">Login </Button>
+        <Button variant="secondary">Sign in</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[420px]">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <Loader2 className="w-10 h-10 animate-spin" />
           </div>
         )}
@@ -112,6 +112,9 @@ const LoginDialog = () => {
                         variant="ghost"
                         className="absolute right-0 top-0"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? <Eye /> : <EyeOff />}
                       </Button>

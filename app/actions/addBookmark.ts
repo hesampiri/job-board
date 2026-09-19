@@ -1,31 +1,29 @@
 "use server";
 
+import { auth } from "@/auth";
 import { prisma } from "@/prisma";
 
 export const AddBookmark = async (formData: FormData) => {
-  const userId = formData.get("userId") as string;
+  const session = await auth();
+  if (!session?.user) {
+    return { type: "error", message: "You need to sign in first" };
+  }
+
+  const userId = session.user.id;
   const jobId = formData.get("jobId") as string;
 
-  if (!userId || !jobId) {
-    return { type: "error", message: "you need to create a account first" };
+  if (!jobId) {
+    return { type: "error", message: "Missing job ID" };
   }
 
   try {
-    const existance = await prisma.bookmark.findFirst({
-      where: {
-        jobId,
-        userId,
-      },
+    const existing = await prisma.bookmark.findFirst({
+      where: { jobId, userId },
     });
 
-    if (existance) {
-      await prisma.bookmark.delete({
-        where: {
-          id: existance.id,
-        },
-      });
-
-      return { message: "bookmark removed", type: "remove" };
+    if (existing) {
+      await prisma.bookmark.delete({ where: { id: existing.id } });
+      return { message: "Bookmark removed", type: "remove" };
     }
 
     await prisma.bookmark.create({
@@ -36,7 +34,7 @@ export const AddBookmark = async (formData: FormData) => {
     });
     return { type: "success", message: "Bookmarked successfully" };
   } catch (error) {
-    console.log(error);
+    console.error("AddBookmark error:", error);
     return { type: "error", message: "Bookmark failed" };
   }
 };

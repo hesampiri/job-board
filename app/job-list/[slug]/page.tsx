@@ -1,13 +1,38 @@
 import { prisma } from "@/prisma";
 import Image from "next/image";
 import { auth } from "@/auth";
+import { notFound } from "next/navigation";
 import { BookmarkButton } from "@/components/bookmarkButton";
 import AddApplicationButton from "@/components/addApplicationButton";
+import type { Metadata } from "next";
 
-const ViewJobpage = async ({ params }: { params: Promise<{ slug: string }>; }) => {
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const job = await prisma.job.findUnique({
+    where: { id: slug },
+    include: { company: true },
+  });
+
+  if (!job) {
+    return { title: "Job not found" };
+  }
+
+  return {
+    title: `${job.title} at ${job.company.name}`,
+    description: job.description.slice(0, 160),
+    openGraph: {
+      title: `${job.title} at ${job.company.name}`,
+      description: job.description.slice(0, 160),
+      type: "website",
+    },
+  };
+}
+
+const ViewJobpage = async ({ params }: Props) => {
   const session = await auth();
   const userRole = session?.user.role;
-  const userId = session?.user.id;
   const { slug } = await params;
   const job = await prisma.job.findUnique({
     where: {
@@ -17,6 +42,10 @@ const ViewJobpage = async ({ params }: { params: Promise<{ slug: string }>; }) =
       company: true,
     },
   });
+
+  if (!job) {
+    notFound();
+  }
 
   const getPostTime = (date: Date) => {
     const now = new Date();
@@ -32,48 +61,48 @@ const ViewJobpage = async ({ params }: { params: Promise<{ slug: string }>; }) =
   };
 
   return (
-    <div className="mx-auto container">
-      <div className="shadow-md shadow-gray-500 max-w-[900px] mx-auto sm:mt-0 mt-10">
-        <div className="border p-5 mx-auto flex items-center">
-          <div className="relative sm:w-[90px] sm:h-[90px] w-14 h-14">
+    <div className="container mx-auto max-w-[900px]">
+      <div className="rounded-2xl border border-hairline bg-surface-1">
+        <div className="flex items-center gap-4 border-b border-hairline p-6">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-hairline bg-surface-2">
             <Image
-              alt="companyLogo"
-              src={job?.company.logoUrl || "/images/default-cmpny.jpg"}
+              alt={`${job.company.name} logo`}
+              src={job.company.logoUrl || "/images/default-cmpny.jpg"}
               fill
-              className="object-cover rounded"
+              className="object-cover"
             />
           </div>
-          <div>
-            <p className="capitalize ml-5 font-semibold sm:text-base text-sm">
-              {job?.company.name}
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-medium capitalize">
+              {job.company.name}
             </p>
-            <p className="capitalize ml-5 text-gray-500 sm:text-base text-sm">
-              {job?.company.description}
+            <p className="truncate text-sm capitalize text-ink-subtle">
+              {job.company.description}
             </p>
           </div>
-          <BookmarkButton userId={userId as string} jobId={job?.id as string} />
+          <BookmarkButton jobId={job.id} />
         </div>
-        <div className="p-5 border mx-auto font-mono">
-          <h1 className="text-2xl font-extrabold">{job?.title}</h1>
-          <pre className="text-sm whitespace-pre-wrap break-words max-w-full overflow-x-auto mt-5">
-            {job?.description}
+        <div className="p-6">
+          <h1 className="text-2xl font-semibold tracking-[-0.02em]">
+            {job.title}
+          </h1>
+          <pre className="mt-5 max-w-full overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm text-ink-muted">
+            {job.description}
           </pre>
-          <div className="text-sm grid grid-cols-2 my-10">
-            <p className="font-semibold">Location:</p>
-            <p>{job?.location}</p>
-            <p className="font-semibold">Type:</p>
-            <p>{job?.type}</p>
-            <p className="font-semibold">Salary:</p>
-            <p>${job?.salary.toLocaleString()}</p>
+          <div className="my-8 grid grid-cols-2 gap-y-3 border-y border-hairline py-6 text-sm">
+            <p className="text-ink-subtle">Location</p>
+            <p className="capitalize">{job.location}</p>
+            <p className="text-ink-subtle">Type</p>
+            <p className="capitalize">{job.type.replace("_", " ")}</p>
+            <p className="text-ink-subtle">Salary</p>
+            <p>${job.salary.toLocaleString()}</p>
           </div>
-          <p className="text-gray-500">posted {getPostTime(job!.createdAt)}</p>
+          <p className="text-xs text-ink-tertiary">
+            Posted {getPostTime(job.createdAt)}
+          </p>
         </div>
-        <div className="p-5">
-          <AddApplicationButton
-            jobId={job?.id as string}
-            userId={userId}
-            userRole={userRole}
-          />
+        <div className="border-t border-hairline p-6">
+          <AddApplicationButton jobId={job.id} userRole={userRole} />
         </div>
       </div>
     </div>
