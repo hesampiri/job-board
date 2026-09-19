@@ -99,4 +99,33 @@ body {
   h4 {
     letter-spacing: -0.02em;
   }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--hairline-strong)) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--hairline-strong));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
